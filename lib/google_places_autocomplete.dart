@@ -148,16 +148,16 @@ class _GooglePlaceAutoCompleteTextFieldState
     );
   }
 
+  // Fixed getLocation method
   getLocation(String text) async {
+    print("🔍 Making API request for: '$text'");
+
     String apiURL =
         "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$text&key=${widget.googleAPIKey}&language=${widget.language}";
 
     if (widget.countries != null) {
-      // in
-
       for (int i = 0; i < widget.countries!.length; i++) {
         String country = widget.countries![i];
-
         if (i == 0) {
           apiURL = "$apiURL&components=country:$country";
         } else {
@@ -165,6 +165,7 @@ class _GooglePlaceAutoCompleteTextFieldState
         }
       }
     }
+
     if (widget.placeType != null) {
       apiURL += "&types=${widget.placeType?.apiString}";
     }
@@ -181,16 +182,25 @@ class _GooglePlaceAutoCompleteTextFieldState
       _cancelToken = CancelToken();
     }
 
-    // print("urlll $apiURL");
+    print("📡 API URL: $apiURL");
+
     try {
       String proxyURL = "https://cors-anywhere.herokuapp.com/";
       String url = kIsWeb ? proxyURL + apiURL : apiURL;
 
-      Response response = await _dio.get(url);
+      print("🌐 Final URL: $url");
+      print("⏳ Sending request...");
+
+      Response response = await _dio.get(url, cancelToken: _cancelToken);
+
+      print("✅ Response received: ${response.statusCode}");
+      print("📄 Response data: ${response.data}");
+
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       Map map = response.data;
       if (map.containsKey("error_message")) {
+        print("❌ API returned error: ${map['error_message']}");
         throw response.data;
       }
 
@@ -198,24 +208,41 @@ class _GooglePlaceAutoCompleteTextFieldState
           PlacesAutocompleteResponse.fromJson(response.data);
 
       if (text.isEmpty) {
+        print("📝 Text became empty during request, clearing overlay");
         alPredictions.clear();
-        _overlayEntry!.remove();
+        _removeOverlay();
         return;
       }
 
       isSearched = false;
       alPredictions.clear();
+
       if (subscriptionResponse.predictions!.isNotEmpty &&
           (widget.textEditingController.text.toString().trim()).isNotEmpty) {
         alPredictions.addAll(subscriptionResponse.predictions!);
+        print("📍 Found ${alPredictions.length} predictions");
+      } else {
+        print("📍 No predictions found");
       }
 
-      _overlayEntry = null;
-      _overlayEntry = _createOverlayEntry();
-      Overlay.of(context).insert(_overlayEntry!);
+      _showOverlay();
     } catch (e) {
+      print("❌ API Error: $e");
       var errorHandler = ErrorHandler.internal().handleError(e);
       _showSnackBar("${errorHandler.message}");
+    }
+  }
+
+  // Helper method to show overlay
+  void _showOverlay() {
+    _removeOverlay(); // Remove existing overlay first
+
+    if (alPredictions.isNotEmpty) {
+      _overlayEntry = _createOverlayEntry();
+      if (_overlayEntry != null) {
+        Overlay.of(context).insert(_overlayEntry!);
+        print("✨ Overlay shown with ${alPredictions.length} items");
+      }
     }
   }
 
@@ -230,11 +257,27 @@ class _GooglePlaceAutoCompleteTextFieldState
   }
 
   textChanged(String text) async {
+    print("🔄 Text changed: '$text'");
+
     if (text.isNotEmpty) {
       getLocation(text);
     } else {
+      print("📝 Text is empty, clearing predictions");
       alPredictions.clear();
-      _overlayEntry!.remove();
+      _removeOverlay();
+    }
+  }
+
+  // Helper method to safely remove overlay
+  void _removeOverlay() {
+    if (_overlayEntry != null) {
+      try {
+        _overlayEntry!.remove();
+        _overlayEntry = null;
+        print("🗑️ Overlay removed");
+      } catch (e) {
+        print("⚠️ Error removing overlay: $e");
+      }
     }
   }
 
@@ -321,6 +364,7 @@ class _GooglePlaceAutoCompleteTextFieldState
     }
   }
 
+  // Fixed clearData method
   void clearData() {
     widget.textEditingController.clear();
     if (_cancelToken?.isCancelled == false) {
@@ -332,11 +376,8 @@ class _GooglePlaceAutoCompleteTextFieldState
       isCrossBtn = false;
     });
 
-    if (_overlayEntry != null) {
-      try {
-        _overlayEntry?.remove();
-      } catch (e) {}
-    }
+    _removeOverlay();
+    print("🧽 All data cleared");
   }
 
   _showCrossIconWidget() {

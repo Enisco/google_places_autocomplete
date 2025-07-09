@@ -8,18 +8,18 @@ class PlacesAutocompleteResponse {
     if (json['predictions'] != null) {
       predictions = [];
       json['predictions'].forEach((v) {
-        predictions!.add(new Prediction.fromJson(v));
+        predictions!.add(Prediction.fromJson(v));
       });
     }
     status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.predictions != null) {
-      data['predictions'] = this.predictions!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (predictions != null) {
+      data['predictions'] = predictions!.map((v) => v.toJson()).toList();
     }
-    data['status'] = this.status;
+    data['status'] = status;
     return data;
   }
 }
@@ -54,18 +54,18 @@ class Prediction {
     if (json['matched_substrings'] != null) {
       matchedSubstrings = [];
       json['matched_substrings'].forEach((v) {
-        matchedSubstrings!.add(new MatchedSubstrings.fromJson(v));
+        matchedSubstrings!.add(MatchedSubstrings.fromJson(v));
       });
     }
     placeId = json['place_id'];
     reference = json['reference'];
     structuredFormatting = json['structured_formatting'] != null
-        ? new StructuredFormatting.fromJson(json['structured_formatting'])
+        ? StructuredFormatting.fromJson(json['structured_formatting'])
         : null;
     if (json['terms'] != null) {
       terms =[];
       json['terms'].forEach((v) {
-        terms!.add(new Terms.fromJson(v));
+        terms!.add(Terms.fromJson(v));
       });
     }
     types = json['types'].cast<String>();
@@ -74,24 +74,24 @@ class Prediction {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['description'] = this.description;
-    data['id'] = this.id;
-    if (this.matchedSubstrings != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['description'] = description;
+    data['id'] = id;
+    if (matchedSubstrings != null) {
       data['matched_substrings'] =
-          this.matchedSubstrings!.map((v) => v.toJson()).toList();
+          matchedSubstrings!.map((v) => v.toJson()).toList();
     }
-    data['place_id'] = this.placeId;
-    data['reference'] = this.reference;
-    if (this.structuredFormatting != null) {
-      data['structured_formatting'] = this.structuredFormatting!.toJson();
+    data['place_id'] = placeId;
+    data['reference'] = reference;
+    if (structuredFormatting != null) {
+      data['structured_formatting'] = structuredFormatting!.toJson();
     }
-    if (this.terms != null) {
-      data['terms'] = this.terms!.map((v) => v.toJson()).toList();
+    if (terms != null) {
+      data['terms'] = terms!.map((v) => v.toJson()).toList();
     }
-    data['types'] = this.types;
-    data['lat'] = this.lat;
-    data['lng'] = this.lng;
+    data['types'] = types;
+    data['lat'] = lat;
+    data['lng'] = lng;
 
     return data;
   }
@@ -109,9 +109,9 @@ class MatchedSubstrings {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['length'] = this.length;
-    data['offset'] = this.offset;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['length'] = length;
+    data['offset'] = offset;
     return data;
   }
 }
@@ -130,9 +130,9 @@ class StructuredFormatting {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['main_text'] = this.mainText;
-    data['secondary_text'] = this.secondaryText;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['main_text'] = mainText;
+    data['secondary_text'] = secondaryText;
     return data;
   }
 }
@@ -149,9 +149,9 @@ class Terms {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['offset'] = this.offset;
-    data['value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['offset'] = offset;
+    data['value'] = value;
     return data;
   }
 }

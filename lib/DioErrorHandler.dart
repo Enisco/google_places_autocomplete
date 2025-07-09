@@ -36,19 +36,21 @@ class DioErrorHandler {
           if (dioError.response?.data['message'] != null) {
             errorResponse.message = dioError.response?.data['message'];
           } else {
-            if ((dioError.response?.statusMessage ?? "").isNotEmpty)
+            if ((dioError.response?.statusMessage ?? "").isNotEmpty) {
               errorResponse.message = dioError.response?.statusMessage;
-            else
+            } else {
               return _handleError(
                   dioError.response!.statusCode, dioError.response!.data);
+            }
           }
         } catch (e) {
 
-          if ((dioError.response?.statusMessage ?? "").isNotEmpty)
+          if ((dioError.response?.statusMessage ?? "").isNotEmpty) {
             errorResponse.message = dioError.response?.statusMessage;
-          else
+          } else {
             return _handleError(
                 dioError.response!.statusCode, dioError.response!.data);
+          }
         }
 
         break;
